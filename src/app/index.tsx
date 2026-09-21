@@ -1,98 +1,101 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import {
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { StudentCard } from '../components/StudentCard';
+import { ScanCounter } from '../components/ScanCounter';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+const student = {
+  name: 'Kristine M. Lahoy',
+  idNumber: '2024-2487',
+  program: 'BS in Information Technology',
+  yearLevel: '3rd Year — Section C',
+  avatarUrl: 'https://i.pravatar.cc/150?img=12',
+  campus: 'Main Campus (Guang-guang, Mati City)',
+};
 
 export default function HomeScreen() {
+  const [scanCount, setScanCount] = useState<number>(0);
+  const [isPassActive, setIsPassActive] = useState<boolean>(true);
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>DOrSU Digital Campus Pass</Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+      <StudentCard
+        student={student}
+        isActive={isPassActive}
+      />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+      <ScanCounter
+        count={scanCount}
+        onScan={() => setScanCount((prev) => prev + 1)}
+        onReset={() => setScanCount(0)}
+      />
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      <View style={styles.toggleRow}>
+        <Text style={styles.toggleText}>
+          Pass Active
+        </Text>
+
+        <Switch
+          value={isPassActive}
+          onValueChange={setIsPassActive}
+        />
+      </View>
+
+      <Pressable
+        style={styles.button}
+        onPress={() => alert('Campus Pass pressed!')}
+      >
+        <Text style={styles.buttonText}>Open Campus Pass</Text>
+      </Pressable>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    padding: 20,
+    gap: 15,
+    paddingTop: 50,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
+
   title: {
+    fontSize: 20,
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginTop: 20,
   },
-  code: {
-    textTransform: 'uppercase',
+
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+
+  toggleText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  button: {
+    padding: 15,
+    borderRadius: 20,
+    backgroundColor: '#2b7a78',
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
